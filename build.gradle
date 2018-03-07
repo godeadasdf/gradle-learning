@@ -1,0 +1,162 @@
+
+task printStringClass << {
+    def str1 = '单引号'
+    def str2 = "双引号"
+
+    println "单引号定义的字符窜类型" + str1.getClass().name
+    println "双引号定义的字符串类型" + str2.getClass().name
+
+}
+
+task printStringVar << {
+    def name = "张三"
+
+    println '单引号的变量计算：${name}'
+    println "双引号的变量计算：${name}"
+}
+
+task printList << {
+    def numList = [1, 2, 3, 4, 5, 6]
+    println numList[-1]
+
+    numList.each {
+        println it
+    }
+}
+
+task printMap << {
+    def map1 = [width: 1024, height: 768]
+
+    println map1.getClass().name
+
+    map1.each {
+        println "Key:${it.key.getClass().name} Value:${it.value}"
+    }
+}
+
+task invokeMethod << {
+    method(1, 3)
+    method 1, 2
+}
+
+def method(int a, int b) {
+    println a + b
+}
+
+task printMethodReturn << {
+    def add1 = method2 1, 2
+    def add2 = method2 5, 3
+    println "add1:${add1}, add2:${add2}"
+}
+
+def method2(int a, int b) {
+    if (a > b) {
+        a
+    } else {
+        b
+    }
+}
+
+task helloJavaBean << {
+    Person p = new Person()
+
+    println "名字是${p.name}"
+
+    p.name = "张三"
+
+    println "名字是${p.name}"
+}
+
+helloJavaBean.group = ':a'
+
+/*class Person {
+    private String name
+}*/
+
+task helloClosure << {
+    customEach {
+        println it
+    }
+}
+
+def customEach(closure) {
+    for (int i in 1..10) {
+        closure(i)
+    }
+}
+
+
+task configClosure << {
+        person {
+            personName = "张三"
+            personAge = 20
+            dumpPerson()
+    }
+}
+
+class Person {
+    String personName
+    int personAge
+
+    def dumpPerson() {
+        println "name is ${personName} age is ${personAge}"
+    }
+}
+
+def person(Closure<Person> closure) {
+    Person p = new Person()
+    closure.delegate = p
+
+    //closure.setResolveStrategy(Closure.DELEGATE_FIRST)
+    closure(p)
+}
+
+configClosure.doLast{
+	println 'configClosure.doLast'
+}
+
+
+apply from:'version.gradle'
+
+task printInTask << {
+    println "VERSIONAME ${versionName} "
+}
+
+
+class ExPlugin implements Plugin<Project> {
+
+    @Override
+    void apply(Project target) {
+        target.task('printInTask2') << {
+            println "这是一个通过自定义插件方式创建的任务"
+        }
+    }
+}
+
+apply plugin: ExPlugin
+
+buildscript {
+    dependencies {
+        classpath files('lib/libs/lib.jar')
+    }
+}
+
+apply plugin: 'kang.plugin.plugin'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
